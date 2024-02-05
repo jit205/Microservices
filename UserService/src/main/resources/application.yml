@@ -1,0 +1,82 @@
+
+  spring:
+    application:
+      name: USER-SERVICE
+  #fetching below same thing but to use it many service  so i have create config server and
+  #from there i am fetching from git file data to make it globle use .
+#    to make it distributed system
+    config:
+      import: configserver:http://localhost:8085
+
+#spring:
+    security:
+      oauth2:
+        resourceserver:
+          jwt:
+            issuer-uri: https://dev-55278743.okta.com/oauth2/default
+        client:
+          registration:
+            my-internal-client:
+              provider: okta
+              authorization-grant-type: client_credentials
+              scope: internal
+              client-id: 0oaer01ei56efZLj25d7
+              client-secret: JnNq_IC8mnoCjdtIqV2I4BZHLa_ILSFhphni9TjuRFqXxjEL9hFri3tTcDLV3YjC
+
+          provider:
+            okta:
+              issuer-uri: https://dev-55278743.okta.com/oauth2/default
+
+#
+#  eureka:
+#    instance:
+#      prefix-ip-address: true
+#    client:
+#      fetch-registry: true
+#      register-with-eureka: true
+#      service-url:
+#        defaultZone: http://localhost:8761/eureka
+
+  management:
+    health:
+      circuitbreakers:
+        enabled: true
+    endpoints:
+      web:
+        exposure:
+          include: health
+
+    resilience4j:
+      circuitbreaker:
+        instances:
+          ratingHotelBreaker:
+            registerHealthIndicator: true
+            eventConsumerBufferSize: 10
+            failureRateThreshold: 50
+            minimumNumberOfCalls: 5
+            automaticTransitionFromOpenToHalfOpenEnabled: true
+            waitDurationInOpenState: 6s
+            permittedNumberOfCallsInHalfOpenState: 3
+            slidingWindowSize: 10
+            slidingWindowType: COUNT_BASED
+
+
+
+    retry:
+      instances:
+        ratingHotelService:
+          max-attempts: 3
+          wait-duration: 5s
+
+
+    ratelimiter:
+      instances:
+        userRateLimiter:
+          limit-refresh-period: 4s
+          limit-for-period: 2
+          timeout-duration: 2s
+
+  okta:
+    oauth2:
+      issuer: https://dev-55278743.okta.com/oauth2/default
+      audience: api://default

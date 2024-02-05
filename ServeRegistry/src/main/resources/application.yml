@@ -1,0 +1,9 @@
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-whit-eureka: flase
+    fetch-registry: false
+
+server:
+  port: 8761
